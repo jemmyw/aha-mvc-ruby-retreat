@@ -1,0 +1,24 @@
+diff --git a/dist/sortable.cjs.development.js b/dist/sortable.cjs.development.js
+index 4cefa09d85d2490377fdca141dae93bb2ae7a7c8..493201dd68153c8d4d67b5c92e25a2134f42eda2 100644
+--- a/dist/sortable.cjs.development.js
++++ b/dist/sortable.cjs.development.js
+@@ -512,6 +512,7 @@ function useSortable(_ref) {
+   const setNodeRef = utilities.useCombinedRefs(setDroppableNodeRef, setDraggableNodeRef);
+   const isSorting = Boolean(active);
+   const displaceItem = isSorting && !disableTransforms && isValidIndex(activeIndex) && isValidIndex(overIndex);
++  console.log({displaceItem, isSorting, disableTransforms, activeIndex, overIndex})
+   const shouldDisplaceDragSource = !useDragOverlay && isDragging;
+   const dragSourceDisplacement = shouldDisplaceDragSource && displaceItem ? transform : null;
+   const strategy = localStrategy != null ? localStrategy : globalStrategy;
+diff --git a/dist/sortable.esm.js b/dist/sortable.esm.js
+index c91728d62e3017ed4dde7d6bdae51df1adbe5f08..e3decc113266f6a2ff325f4d665880e861f185b3 100644
+--- a/dist/sortable.esm.js
++++ b/dist/sortable.esm.js
+@@ -505,6 +505,7 @@ function useSortable(_ref) {
+   const setNodeRef = useCombinedRefs(setDroppableNodeRef, setDraggableNodeRef);
+   const isSorting = Boolean(active);
+   const displaceItem = isSorting && !disableTransforms && isValidIndex(activeIndex) && isValidIndex(overIndex);
++  console.log({displaceItem, isSorting, disableTransforms, activeIndex, overIndex})
+   const shouldDisplaceDragSource = !useDragOverlay && isDragging;
+   const dragSourceDisplacement = shouldDisplaceDragSource && displaceItem ? transform : null;
+   const strategy = localStrategy != null ? localStrategy : globalStrategy;

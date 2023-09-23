@@ -5,12 +5,15 @@ import { keys } from "./utils/keys";
 const COMPONENT = Symbol("owner component");
 
 function isReactFunction<P>(
-  component: React.ComponentType<P>,
+  component: React.ComponentType<P>
 ): component is React.FC<P> | ((props: P) => React.ReactElement) {
   return !component.prototype?.isReactComponent;
 }
 
-type ReactComponent<T> = React.ComponentClass<T, any> | React.FC<T> | ((props: T) => React.ReactElement);
+type ReactComponent<T> =
+  | React.ComponentClass<T, any>
+  | React.FC<T>
+  | ((props: T) => React.ReactElement);
 
 class ViewUpdateEmitter {
   static batching = false;
@@ -128,7 +131,7 @@ export function ApplicationView<T>(Comp: ReactComponent<T>, options?: Options) {
         },
         // Adding the original Comp here is necessary to make React Hot Reload work
         // it does not affect behavior otherwise
-        [Comp],
+        [Comp]
       );
 
       // cleanup the reactive connections after the very last render of the component
@@ -143,7 +146,7 @@ export function ApplicationView<T>(Comp: ReactComponent<T>, options?: Options) {
         return () => {
           emitter.off();
           // We don't need to trigger a render after the component is removed.
-          unobserve(render);
+          // unobserve(render);
         };
       }, []);
 
@@ -184,7 +187,11 @@ export function ApplicationView<T>(Comp: ReactComponent<T>, options?: Options) {
       }
 
       // react should trigger updates on prop changes, while easyState handles store changes
-      override shouldComponentUpdate(nextProps: Readonly<T>, nextState: any, nextContext: any) {
+      override shouldComponentUpdate(
+        nextProps: Readonly<T>,
+        nextState: any,
+        nextContext: any
+      ) {
         const { props, state } = this;
 
         // respect the case when the user defines a shouldComponentUpdate
@@ -200,7 +207,10 @@ export function ApplicationView<T>(Comp: ReactComponent<T>, options?: Options) {
         // the component should update if any of its props shallowly changed value
         const propKeys = keys(props);
         const nextKeys = keys(nextProps);
-        return nextKeys.length !== propKeys.length || nextKeys.some((key) => props[key] !== nextProps[key]);
+        return (
+          nextKeys.length !== propKeys.length ||
+          nextKeys.some((key) => props[key] !== nextProps[key])
+        );
       }
 
       override componentWillUnmount() {
