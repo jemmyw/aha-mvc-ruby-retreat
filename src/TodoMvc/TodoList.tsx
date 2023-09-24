@@ -17,30 +17,11 @@ import { ApplicationView, useController } from "../lib/mvc";
 import SortableTodoItem from "./SortableTodoItem";
 import TodoItem from "./TodoItem";
 import TodoListController from "./controllers/TodoListController";
-
-const AddItemButton = ApplicationView(() => {
-  const controller = useController(TodoListController);
-
-  const handleClick = () => {
-    controller.actionAddTodoItem();
-  };
-
-  return (
-    <div>
-      <button
-        className="px-2 py-1 border rounded bg-slate-200 border-slate-400 text-slate-800"
-        onClick={handleClick}
-      >
-        Add item
-      </button>
-    </div>
-  );
-});
+import AddItemButton from "./AddItemButton";
 
 const TodoList = () => {
   const controller = useController(TodoListController);
-  const { todoList, dragItemId } = controller.state;
-  const items = todoList.items;
+  const { todoList, dragItemId, loading } = controller.state;
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
@@ -50,9 +31,15 @@ const TodoList = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { over } = event;
     controller.actionSortAtDragEnd(over?.id as string);
+    controller.actionSave();
   };
 
+  if (!todoList || loading) {
+    return <div>Loading...</div>;
+  }
+
   const dragItem = dragItemId ? todoList.findById(dragItemId) : null;
+  const items = todoList.items;
 
   return (
     <div className="flex flex-col gap-4">
@@ -70,7 +57,11 @@ const TodoList = () => {
             strategy={verticalListSortingStrategy}
           >
             {items.map((item, index) => (
-              <SortableTodoItem key={item.id} item={item} index={index} />
+              <SortableTodoItem
+                key={item.id || `unsaved-${index}`}
+                item={item}
+                index={index}
+              />
             ))}
           </SortableContext>
         </ul>

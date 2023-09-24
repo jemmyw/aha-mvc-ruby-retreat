@@ -91,7 +91,7 @@ class ViewUpdateEmitter {
 
   queueIfUpdate() {
     if (this.hasUpdate) {
-      this.queue();
+      this.update();
     }
   }
 

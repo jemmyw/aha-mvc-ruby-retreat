@@ -1,10 +1,9 @@
 import { RefCallback } from "react";
-import { ApplicationView } from "../lib/mvc";
-import { useSortable } from "@dnd-kit/sortable";
 import { twMerge } from "tailwind-merge";
+import { ApplicationView, useController } from "../lib/mvc";
+import TodoItemController from "./controllers/TodoItemController";
 
 interface Props {
-  item: import("./models/TodoItem").default;
   index: number;
   itemRef?: RefCallback<HTMLElement>;
   handleRef?: RefCallback<HTMLElement>;
@@ -16,7 +15,6 @@ interface Props {
 }
 
 const TodoItem: React.FC<Props> = ({
-  item,
   itemRef,
   handleRef,
   attributes,
@@ -25,12 +23,19 @@ const TodoItem: React.FC<Props> = ({
   style,
   className,
 }) => {
+  const controller = useController(TodoItemController);
+  const { item } = controller.state;
+
   const handleCompleted = () => {
-    item.completed = !item.completed;
+    controller.actionUpdate({ completed: !item.completed });
   };
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    item.name = event.target.value;
+    controller.actionUpdate({ name: event.target.value });
+  };
+
+  const handleClickDelete = () => {
+    controller.actionDelete();
   };
 
   const Tag = tag || "li";
@@ -64,9 +69,10 @@ const TodoItem: React.FC<Props> = ({
           className="w-full p-1 text-gray-100 bg-gray-700 rounded-none focus:outline-none active:border-gray-700 "
           onChange={handleNameChange}
         />
+        <button onClick={handleClickDelete}>x</button>
       </div>
     </Tag>
   );
 };
 
-export default ApplicationView(TodoItem);
+export default TodoItemController.scope(ApplicationView(TodoItem));

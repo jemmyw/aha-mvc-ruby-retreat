@@ -11,6 +11,7 @@ export interface TodoItem {
   listId: string;
   name: string;
   completed: boolean;
+  index: number;
 }
 type WithId = { id: string };
 
@@ -79,11 +80,11 @@ function createDeleteFunction(
   };
 }
 
-// Create Todo List
-export async function createTodoList(name: string): Promise<TodoList> {
+export async function createTodoList(name: string) {
   const store = await readWriteTx("todoLists");
   const id = nanoid();
-  return idbPromise(store.add({ id, name }));
+  await idbPromise(store.add({ id, name }));
+  return id;
 }
 
 export const updateTodoList = createUpdateFunction<TodoList>("todoLists");
@@ -95,9 +96,10 @@ export const deleteTodoItem = createDeleteFunction("todoItems");
 export async function createTodoItem(listId: string) {
   const store = await readWriteTx("todoItems");
   const id = nanoid();
-  return idbPromise<TodoItem>(
+  await idbPromise<TodoItem>(
     store.add({ id, listId, name: "", completed: false })
   );
+  return id;
 }
 
 export async function getTodoListWithItems(listId: string) {
@@ -121,6 +123,14 @@ export async function getTodoListWithItems(listId: string) {
       };
     }
   );
+}
+
+export async function listAllTodoLists(): Promise<TodoList[]> {
+  if (!db) await initializeDB();
+  const store = db
+    .transaction("todoLists", "readonly")
+    .objectStore("todoLists");
+  return idbPromise<TodoList[]>(store.getAll());
 }
 
 // Initialize DB when the script loads
