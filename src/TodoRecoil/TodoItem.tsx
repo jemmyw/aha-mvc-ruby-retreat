@@ -40,7 +40,6 @@ const TodoItem: React.FC<Props> = ({
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTodoList((old) => {
       const index = findIndexById(old, item.id);
-
       return replaceItemAtIndex(old, index, {
         ...item,
         name: event.target.value,

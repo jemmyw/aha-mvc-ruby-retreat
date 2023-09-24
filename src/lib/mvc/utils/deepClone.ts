@@ -12,7 +12,7 @@ export function deepClone<T>(obj: T): T {
   } else if (obj instanceof Map) {
     copy = new Map();
   } else {
-    copy = {};
+    copy = Object.create(Object.getPrototypeOf(obj));
   }
 
   if (obj instanceof Set) {
@@ -21,8 +21,9 @@ export function deepClone<T>(obj: T): T {
     obj.forEach((val, key) => copy.set(deepClone(key), deepClone(val)));
   } else {
     for (const key in obj) {
-      // @ts-ignore
-      copy[key] = deepClone(obj[key]);
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copy[key] = deepClone(obj[key]);
+      }
     }
   }
 

@@ -14,12 +14,12 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { nanoid } from "nanoid";
 import { useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import SortableTodoItem from "./SortableTodoItem";
 import TodoItem from "./TodoItem";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { findById, todoListState } from "./store/todo";
-import { nanoid } from "nanoid";
 
 const AddItemButton = () => {
   const setTodoList = useSetRecoilState(todoListState);

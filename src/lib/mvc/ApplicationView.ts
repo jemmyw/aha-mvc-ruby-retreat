@@ -16,9 +16,34 @@ type ReactComponent<T> =
   | ((props: T) => React.ReactElement);
 
 class ViewUpdateEmitter {
-  static batching = false;
+  private static _batching = false;
+  private static _immediate = false;
   static instances: WeakRef<ViewUpdateEmitter>[] = [];
   static batchedInstances: WeakRef<ViewUpdateEmitter>[] = [];
+
+  static reset() {
+    this.resolveBatches();
+    this._batching = false;
+    this._immediate = false;
+  }
+
+  static set immediate(value: boolean) {
+    if (value && this.batching)
+      throw new Error("Cannot set immediate while batching");
+    this._immediate = value;
+  }
+  static get immediate() {
+    return this._immediate;
+  }
+
+  static set batching(value: boolean) {
+    if (value && this._immediate)
+      throw new Error("Cannot batch while immediate");
+    this._batching = value;
+  }
+  static get batching() {
+    return this._batching;
+  }
 
   static updateAll() {
     ViewUpdateEmitter.instances.forEach((ref) => {
@@ -79,17 +104,23 @@ class ViewUpdateEmitter {
       return;
     }
 
-    queueMicrotask(() => {
-      this.queued = false;
+    if (ViewUpdateEmitter.immediate) {
+      this.update();
+    } else {
+      this.queued = true;
+      queueMicrotask(() => this.update());
+    }
+  }
 
-      if (this.callback) {
-        this.hasUpdate = false;
-        this.callback();
-      } else {
-        this.hasUpdate = true;
-      }
-    });
-    this.queued = true;
+  update() {
+    this.queued = false;
+
+    if (this.callback) {
+      this.hasUpdate = false;
+      this.callback();
+    } else {
+      this.hasUpdate = true;
+    }
   }
 }
 
@@ -102,9 +133,14 @@ export async function batch<T>(fn: () => Promise<T>): Promise<T> {
 
   ViewUpdateEmitter.batching = true;
   const result = await fn();
+  ViewUpdateEmitter.reset();
+  return result;
+}
 
-  ViewUpdateEmitter.batching = false;
-  ViewUpdateEmitter.resolveBatches();
+export function immediate<T>(fn: () => T): T {
+  ViewUpdateEmitter.immediate = true;
+  const result = fn();
+  ViewUpdateEmitter.reset();
   return result;
 }
 
