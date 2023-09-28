@@ -14,20 +14,19 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { nanoid } from "nanoid";
 import { useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import SortableTodoItem from "./SortableTodoItem";
 import TodoItem from "./TodoItem";
-import { findById, todoListState } from "./store/todo";
+import { findById, isLoadedState, todoListItems } from "./store/todo";
 
 const AddItemButton = () => {
-  const setTodoList = useSetRecoilState(todoListState);
+  const setTodoList = useSetRecoilState(todoListItems);
 
   const handleClick = () => {
     setTodoList((old) => [
       ...old,
-      { id: nanoid(), name: "", completed: false },
+      { id: undefined, name: "", completed: false },
     ]);
   };
 
@@ -44,7 +43,8 @@ const AddItemButton = () => {
 };
 
 const TodoList = () => {
-  const [todoList, setTodoList] = useRecoilState(todoListState);
+  const isLoaded = useRecoilValue(isLoadedState);
+  const [todoList, setTodoList] = useRecoilState(todoListItems);
 
   const [dragItemId, setDragItem] = useState<string | null>(null);
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
@@ -65,6 +65,8 @@ const TodoList = () => {
 
   const dragItem = dragItemId ? findById(todoList, dragItemId) : null;
 
+  if (!isLoaded) return <div>Loading...</div>;
+
   return (
     <div className="flex flex-col gap-4">
       <AddItemButton />
@@ -81,7 +83,11 @@ const TodoList = () => {
             strategy={verticalListSortingStrategy}
           >
             {todoList.map((item, index) => (
-              <SortableTodoItem key={item.id} item={item} index={index} />
+              <SortableTodoItem
+                key={item.id || `unsaved-${index}`}
+                item={item}
+                index={index}
+              />
             ))}
           </SortableContext>
         </ul>

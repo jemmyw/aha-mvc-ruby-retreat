@@ -102,6 +102,15 @@ export async function createTodoItem(listId: string) {
   return id;
 }
 
+export async function getTodoItems(listId: string) {
+  if (!db) await initializeDB();
+  const store = db
+    .transaction("todoItems", "readonly")
+    .objectStore("todoItems")
+    .index("listId");
+  return idbPromise<TodoItem[]>(store.getAll(listId));
+}
+
 export async function getTodoListWithItems(listId: string) {
   if (!db) await initializeDB();
   return new Promise<{ list: TodoList; items: TodoItem[] }>(
