@@ -1,7 +1,8 @@
-import { RefCallback } from "react";
-import { useSetRecoilState } from "recoil";
+import { RefCallback, useCallback, useRef } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { twMerge } from "tailwind-merge";
-import { findIndexById, replaceItemAtIndex, todoListState } from "./store/todo";
+import { updateTodoItem } from "../api";
+import { doWithSaving, isSavingState, todoListItemState } from "./store/todo";
 
 interface Props {
   item: import("./store/todo").TodoItem;
@@ -25,27 +26,33 @@ const TodoItem: React.FC<Props> = ({
   style,
   className,
 }) => {
-  const setTodoList = useSetRecoilState(todoListState);
+  const [todoItem, setTodoItem] = useRecoilState(todoListItemState(item.id));
+  const setIsSaving = useSetRecoilState(isSavingState);
+  const savingTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCompleted = () => {
-    setTodoList((old) => {
-      const index = findIndexById(old, item.id);
-      return replaceItemAtIndex(old, index, {
-        ...item,
-        completed: !item.completed,
+  const save = useCallback((todoItem: Props["item"]) => {
+    if (savingTimeout.current) return;
+    savingTimeout.current = setTimeout(() => {
+      doWithSaving(setIsSaving, async () => {
+        await updateTodoItem(todoItem.id, todoItem);
+        savingTimeout.current = null;
       });
-    });
-  };
+    }, 250);
+  }, []);
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTodoList((old) => {
-      const index = findIndexById(old, item.id);
-      return replaceItemAtIndex(old, index, {
-        ...item,
-        name: event.target.value,
-      });
-    });
-  };
+  const handleCompleted = useCallback(() => {
+    const completed = !todoItem.completed;
+    setTodoItem({ ...todoItem, completed });
+    save({ ...todoItem, completed });
+  }, [save, todoItem]);
+
+  const handleNameChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTodoItem({ ...todoItem, name: event.target.value });
+      save({ ...todoItem, name: event.target.value });
+    },
+    [save, todoItem]
+  );
 
   const Tag = tag || "li";
 

@@ -14,40 +14,52 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useCallback, useEffect, useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { createTodoList, getTodoListWithItems, listAllTodoLists } from "../api";
+import { AddItemButton } from "./AddItemButton";
 import SortableTodoItem from "./SortableTodoItem";
 import TodoItem from "./TodoItem";
-import { findById, isLoadedState, todoListItems } from "./store/todo";
-
-const AddItemButton = () => {
-  const setTodoList = useSetRecoilState(todoListItems);
-
-  const handleClick = () => {
-    setTodoList((old) => [
-      ...old,
-      { id: undefined, name: "", completed: false },
-    ]);
-  };
-
-  return (
-    <div>
-      <button
-        className="px-2 py-1 border rounded bg-slate-200 border-slate-400 text-slate-800"
-        onClick={handleClick}
-      >
-        Add item
-      </button>
-    </div>
-  );
-};
+import {
+  doWithSaving,
+  findById,
+  isSavingState,
+  loadingState,
+  todoListItemsState,
+  todoListState,
+  updateAllTodoListItems,
+} from "./store/todo";
 
 const TodoList = () => {
-  const isLoaded = useRecoilValue(isLoadedState);
-  const [todoList, setTodoList] = useRecoilState(todoListItems);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [todoList, setTodoList] = useRecoilState(todoListState);
+  const [todoListItems, setTodoListItems] = useRecoilState(todoListItemsState);
+  const setSaving = useSetRecoilState(isSavingState);
 
   const [dragItemId, setDragItem] = useState<string | null>(null);
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+
+  const getOrCreateTodoList = useCallback(async () => {
+    const todoLists = await listAllTodoLists();
+    if (todoLists.length > 0) {
+      const response = await getTodoListWithItems(todoLists[0].id);
+      setTodoList(response.list);
+      setTodoListItems(response.items.toSorted((a, b) => a.index - b.index));
+    } else {
+      const id = await createTodoList("My todo list");
+      setTodoList({ id });
+      setTodoListItems([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loading === "not_loaded") {
+      setLoading("loading");
+      getOrCreateTodoList().then(() => {
+        setLoading("loaded");
+      });
+    }
+  }, [loading]);
 
   const handleDragStart = (event: DragStartEvent) => {
     setDragItem(event.active.id as string);
@@ -55,17 +67,20 @@ const TodoList = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
-      const oldIndex = todoList.findIndex((item) => item.id === active.id);
-      const newIndex = todoList.findIndex((item) => item.id === over?.id);
-      setTodoList((list) => arrayMove(list, oldIndex, newIndex));
+      const oldIndex = todoListItems.findIndex((item) => item.id === active.id);
+      const newIndex = todoListItems.findIndex((item) => item.id === over?.id);
+      const list = arrayMove(todoListItems, oldIndex, newIndex);
+      setTodoListItems(list);
+      doWithSaving(setSaving, () => updateAllTodoListItems(todoList.id, list));
     }
 
     setDragItem(null);
   };
 
-  const dragItem = dragItemId ? findById(todoList, dragItemId) : null;
+  const dragItem = dragItemId ? findById(todoListItems, dragItemId) : null;
 
-  if (!isLoaded) return <div>Loading...</div>;
+  if (loading === "loading") return <div>Loading...</div>;
+  if (loading === "error") return <div>error</div>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -79,10 +94,10 @@ const TodoList = () => {
       >
         <ul className="flex flex-col gap-2">
           <SortableContext
-            items={todoList.map((item) => item.id)}
+            items={todoListItems.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            {todoList.map((item, index) => (
+            {todoListItems.map((item, index) => (
               <SortableTodoItem
                 key={item.id || `unsaved-${index}`}
                 item={item}

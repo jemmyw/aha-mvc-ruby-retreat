@@ -1,7 +1,11 @@
-import { atom, selector, noWait, DefaultValue } from "recoil";
 import {
-  createTodoItem,
-  createTodoList,
+  DefaultValue,
+  SetterOrUpdater,
+  atom,
+  selector,
+  selectorFamily,
+} from "recoil";
+import {
   deleteTodoItem,
   getTodoItems,
   listAllTodoLists,
@@ -30,96 +34,43 @@ export const todoListsState = selector({
   },
 });
 
-export const todoListState = selector<TodoList>({
+export const todoListState = atom<TodoList>({
   key: "TodoList",
-  get: async ({ get }) => {
-    const todoLists = get(todoListsState);
-
-    if (todoLists.length === 0) {
-      const id = await createTodoList("My list");
-      return { id };
-    } else {
-      return todoLists[0];
-    }
-  },
+  default: { id: "" },
 });
 
-export const todoListCacheState = atom<Record<string, TodoItem[]>>({
-  key: "TodoListCache",
-  default: {},
-});
-
-export const todoListItemsFromRemote = selector<TodoItem[]>({
-  key: "TodoListItemsFromRemote",
-  get: async ({ get }) => {
-    const todoList = get(todoListState);
-
-    const items = (await getTodoItems(todoList.id)).toSorted(
-      (a, b) => a.index - b.index
-    );
-
-    return items;
-  },
-});
-
-export const todoListItems = selector<TodoItem[]>({
+export const todoListItemsState = atom<TodoItem[]>({
   key: "TodoListItems",
-  get: async ({ get }) => {
-    const todoList = get(todoListState);
-    const cache = get(todoListCacheState);
-
-    if (cache[todoList.id]) {
-      return cache[todoList.id];
-    }
-    return get(todoListItemsFromRemote);
-  },
-  set: ({ get, set }, newValue) => {
-    if (newValue instanceof DefaultValue) return;
-
-    const todoList = get(todoListState);
-    const items = get(todoListItems);
-
-    const deletedItems = items.filter(
-      (item) => !newValue.find((newItem) => newItem.id === item.id)
-    );
-
-    set(todoListCacheState, (old) => {
-      return { ...old, [todoList.id]: newValue };
-    });
-
-    Promise.all(deletedItems.map((item) => deleteTodoItem(item.id))).then(
-      () => {
-        return Promise.all(
-          newValue.map(async (item, index) => {
-            let id = item.id;
-            if (!id) {
-              id = await createTodoItem(todoList.id);
-            }
-
-            await updateTodoItem(id, {
-              ...item,
-              index,
-              listId: todoList.id,
-            });
-
-            return { ...item, id };
-          })
-        ).then((items) => {
-          set(todoListCacheState, (old) => {
-            return { ...old, [todoList.id]: items };
-          });
-        });
-      }
-    );
-  },
+  default: [],
 });
 
-export const isLoadedState = selector<boolean>({
-  key: "isLoaded",
-  get: ({ get }) => {
-    const items = get(noWait(todoListItems));
-    return items.state === "hasValue";
-  },
+export const todoListItemState = selectorFamily({
+  key: "TodoListItem",
+  get:
+    (id: string) =>
+    ({ get }) => {
+      return findById(get(todoListItemsState), id)!;
+    },
+  set:
+    (id: string) =>
+    ({ set }, newValue) => {
+      if (newValue instanceof DefaultValue || !newValue) {
+        return;
+      }
+      updateTodoListItemState((v) => set(todoListItemsState, v))(id)(newValue);
+    },
+});
+
+export type LoadingState = "not_loaded" | "loading" | "loaded" | "error";
+
+export const loadingState = atom<LoadingState>({
+  key: "Loading",
+  default: "not_loaded",
+});
+
+export const isSavingState = atom({
+  key: "IsSaving",
+  default: false,
 });
 
 export function findById(list: TodoItem[], id: string) {
@@ -141,3 +92,52 @@ export function replaceItemAtIndex(
 export function removeItemAtIndex(arr: TodoItem[], index: number) {
   return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
+
+export const updateTodoListItemState =
+  (setter: SetterOrUpdater<TodoItem[]>) =>
+  (id: string) =>
+  (item: Partial<TodoItem>) => {
+    setter((list) => {
+      const index = findIndexById(list, id);
+      if (index === -1) {
+        return list;
+      }
+      return replaceItemAtIndex(list, index, { ...list[index], ...item });
+    });
+  };
+
+export const doWithSaving = async (
+  setter: SetterOrUpdater<boolean>,
+  callback: () => Promise<void>
+) => {
+  setter(true);
+  try {
+    return await callback();
+  } finally {
+    return setter(false);
+  }
+};
+
+export const updateAllTodoListItems = async (
+  listId: string,
+  items: TodoItem[]
+) => {
+  const existing = await getTodoItems(listId);
+
+  const toUpdate = items.filter((item) => item.id);
+  const toDelete = existing.filter(
+    (item) => !items.find((i) => i.id === item.id)
+  );
+
+  const updatePromises = toUpdate.map((item, index) =>
+    updateTodoItem(item.id, {
+      name: item.name,
+      completed: item.completed,
+      index,
+    })
+  );
+
+  const deletePromises = toDelete.map((item) => deleteTodoItem(item.id));
+
+  await Promise.all([...updatePromises, ...deletePromises]);
+};
