@@ -1,18 +1,18 @@
 import "./App.css";
-import TodoMvc from "./TodoMvc";
-import TodoRecoil from "./TodoRecoil";
+import PresentationController from "./PresentationController";
+import { ApplicationView, useController } from "./lib/mvc";
 
 function App() {
+  const controller = useController(PresentationController);
+  const SlideComponent = controller.SlideComponent;
+
   return (
     <div className="flex justify-around w-screen h-screen">
-      <div className="w-[40%] h-full py-10">
-        <TodoMvc />
-      </div>
-      <div className="w-[40%] h-full py-10">
-        <TodoRecoil />
-      </div>
+      <SlideComponent />
+      <button onClick={() => controller.actionPrevSlide()}>Prev</button>
+      <button onClick={() => controller.actionNextSlide()}>Next</button>
     </div>
   );
 }
 
-export default App;
+export default PresentationController.scope(ApplicationView(App));

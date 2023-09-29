@@ -40,6 +40,9 @@ devDependencies:
   '@types/debug':
     specifier: ^4.1.9
     version: 4.1.9
+  '@types/dom-view-transitions':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@types/react':
     specifier: ^18.2.15
     version: 18.2.15
@@ -67,6 +70,9 @@ devDependencies:
   eslint-plugin-react-refresh:
     specifier: ^0.4.3
     version: 0.4.3(eslint@8.45.0)
+  navigation-api-types:
+    specifier: ^0.4.0
+    version: 0.4.0
   postcss:
     specifier: ^8.4.30
     version: 8.4.30
@@ -568,6 +574,10 @@ packages:
     resolution: {integrity: sha512-8Hz50m2eoS56ldRlepxSBa6PWEVCtzUo/92HgLc2qTMnotJNIm7xP+UZhyWoYsyOdd5dxZ+NZLb24rsKyFs2ow==}
     dependencies:
       '@types/ms': 0.7.31
+    dev: true
+
+  /@types/dom-view-transitions@1.0.2:
+    resolution: {integrity: sha512-+ctRyzGMOZB5AbvhpTv37OWkP9N3Xxfac7bhS7AcuRMmO03SHxm5/5kWCPtcatx2gW+NhFMdl7l1DqJvvPVtwg==}
     dev: true
 
   /@types/json-schema@7.0.13:
@@ -1493,6 +1503,10 @@ packages:
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
+    dev: true
+
+  /navigation-api-types@0.4.0:
+    resolution: {integrity: sha512-KFZi+vM1hHAEnMG3Q3UgXAhP83L98+fKeftDAEkbQ5+tFAwgXx7lMf839mkdVxtehu9xVv42IUvELf3PBhllRw==}
     dev: true
 
   /node-releases@2.0.13:
