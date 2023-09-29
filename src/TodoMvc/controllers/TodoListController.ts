@@ -1,4 +1,4 @@
-import { listAllTodoLists } from "../../api";
+import { listAllTodoLists } from "../../TodoApi";
 import ApplicationController from "../../lib/mvc";
 import { batch, immediate } from "../../lib/mvc/ApplicationView";
 import TodoItem from "../models/TodoItem";

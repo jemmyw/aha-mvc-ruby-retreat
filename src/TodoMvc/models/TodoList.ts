@@ -6,7 +6,7 @@ import {
   getTodoListWithItems,
   updateTodoItem,
   updateTodoList,
-} from "../../api";
+} from "../../TodoApi";
 import TodoItem from "./TodoItem";
 
 export default class TodoList {

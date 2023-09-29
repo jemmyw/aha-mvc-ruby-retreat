@@ -1,7 +1,7 @@
 import { RefCallback, useCallback, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { twMerge } from "tailwind-merge";
-import { updateTodoItem } from "../api";
+import { updateTodoItem } from "../TodoApi";
 import { doWithSaving, isSavingState, todoListItemState } from "./store/todo";
 
 interface Props {

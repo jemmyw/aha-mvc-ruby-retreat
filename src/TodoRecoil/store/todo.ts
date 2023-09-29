@@ -10,7 +10,7 @@ import {
   getTodoItems,
   listAllTodoLists,
   updateTodoItem,
-} from "../../api";
+} from "../../TodoApi";
 
 export interface TodoList {
   id: string;
