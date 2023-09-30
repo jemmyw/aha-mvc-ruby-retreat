@@ -1,6 +1,6 @@
 import { observable, observe } from "@nx-js/observer-util";
 import Debug from "debug";
-import React, { useContext, useEffect, useId, useMemo, useState } from "react";
+import React, { useContext, useEffect, useId, useMemo, useRef, useState } from "react";
 import { deepClone } from "../utils/deepClone";
 import { keys } from "../utils/keys";
 
@@ -145,8 +145,8 @@ class ApplicationController<State extends object = object, Props = object, Paren
 
     this.resetState();
 
-    await this.initialize(initialArgs);
     this.initialized = true;
+    await this.initialize(initialArgs);
   }
 
   destroy(): void {
@@ -154,8 +154,10 @@ class ApplicationController<State extends object = object, Props = object, Paren
   }
 
   internalDestroy() {
+    this.destroy();
     this.deferredDestroyCallbacks.forEach(([_name, callback]) => callback());
     this.deferredDestroyCallbacks = [];
+    this.initialized = false;
   }
 
   private deferredDestroyCallbacks: [string, DependencyCallback][] = [];
@@ -285,6 +287,7 @@ function Controller<C extends ApplicationController<object, unknown, UndefApp>>(
   controllerInitialArgs: ControllerProps<C>;
 }) {
   const parentController = useContext(ControllerContext);
+  const destroyRef = useRef<number|null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   useMemo(() => {
@@ -293,12 +296,20 @@ function Controller<C extends ApplicationController<object, unknown, UndefApp>>(
     });
   }, [controller, parentController, controllerInitialArgs]);
 
-  // Give controller a chance to deregister when it is removed.
+  // Give controller a chance to deregister when it is removed. If the component
+  // is just remounting then we don't want to destroy the controller so do this
+  // in a cancellable timeout.
   useEffect(() => {
+    if(destroyRef.current) {
+      window.clearTimeout(destroyRef.current);
+      destroyRef.current = null;
+    }
+
     return () => {
-      debug(`Destroying controller ${controller.constructor.name}(${controller.id})`);
-      if (controller.destroy) controller.destroy();
-      controller.internalDestroy();
+      destroyRef.current = window.setTimeout(() => {
+        debug(`Destroying controller ${controller.constructor.name}(${controller.id})`);
+        controller.internalDestroy();
+      }, 1);
     };
   }, [controller]);
 
@@ -339,9 +350,3 @@ function useController<Controller extends ApplicationController>(
 }
 
 export { ApplicationController, ControlledComponent, StartControllerScope, useController };
-
-if (import.meta?.hot) {
-  import.meta.hot.on("vite:beforeUpdate", () => {
-    console.log("erm?");
-  });
-}
