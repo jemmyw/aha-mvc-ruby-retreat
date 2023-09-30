@@ -1,8 +1,13 @@
 import { RefCallback, useCallback, useRef } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { twMerge } from "tailwind-merge";
-import { updateTodoItem } from "../TodoApi";
-import { doWithSaving, isSavingState, todoListItemState } from "./store/todo";
+import {
+  doWithSaving,
+  isSavingState,
+  todoListItemState,
+  todoListState,
+  updateTodoItemWithMessage,
+} from "./store/todo";
 
 interface Props {
   item: import("./store/todo").TodoItem;
@@ -26,6 +31,7 @@ const TodoItem: React.FC<Props> = ({
   style,
   className,
 }) => {
+  const todoList = useRecoilValue(todoListState);
   const [todoItem, setTodoItem] = useRecoilState(todoListItemState(item.id));
   const setIsSaving = useSetRecoilState(isSavingState);
   const savingTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -34,7 +40,7 @@ const TodoItem: React.FC<Props> = ({
     if (savingTimeout.current) return;
     savingTimeout.current = setTimeout(() => {
       doWithSaving(setIsSaving, async () => {
-        await updateTodoItem(todoItem.id, todoItem);
+        await updateTodoItemWithMessage(todoList.id, todoItem.id, todoItem);
         savingTimeout.current = null;
       });
     }, 250);

@@ -26,14 +26,7 @@ export default class TodoList {
     todoList.persisted = true;
     todoList.items = items
       .toSorted((a, b) => a.index - b.index)
-      .map((item) => {
-        const todoItem = new TodoItem();
-        todoItem.id = item.id;
-        todoItem.name = item.name;
-        todoItem.completed = item.completed;
-        todoItem.persisted = true;
-        return todoItem;
-      });
+      .map((item) => TodoItem.fromData(item));
     return todoList;
   }
 
@@ -63,8 +56,6 @@ export default class TodoList {
         });
       })
     );
-
-    await new Promise((r) => setTimeout(r, 250));
   }
 
   addItem(item: TodoItem) {
@@ -93,5 +84,13 @@ export default class TodoList {
       0,
       this.items.splice(fromIndex, 1)[0]
     );
+  }
+
+  async reload() {
+    const { list, items } = await getTodoListWithItems(this.id);
+    this.title = list.name;
+    this.items = items
+      .toSorted((a, b) => a.index - b.index)
+      .map((item) => TodoItem.fromData(item));
   }
 }

@@ -16,7 +16,11 @@ import {
 } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { createTodoList, getTodoListWithItems, listAllTodoLists } from "../TodoApi";
+import {
+  createTodoList,
+  getTodoListWithItems,
+  listAllTodoLists,
+} from "../TodoApi";
 import { AddItemButton } from "./AddItemButton";
 import SortableTodoItem from "./SortableTodoItem";
 import TodoItem from "./TodoItem";
@@ -39,12 +43,16 @@ const TodoList = () => {
   const [dragItemId, setDragItem] = useState<string | null>(null);
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
+  const getTodoList = useCallback(async (id: string) => {
+    const response = await getTodoListWithItems(id);
+    setTodoList(response.list);
+    setTodoListItems(response.items.toSorted((a, b) => a.index - b.index));
+  }, []);
+
   const getOrCreateTodoList = useCallback(async () => {
     const todoLists = await listAllTodoLists();
     if (todoLists.length > 0) {
-      const response = await getTodoListWithItems(todoLists[0].id);
-      setTodoList(response.list);
-      setTodoListItems(response.items.toSorted((a, b) => a.index - b.index));
+      await getTodoList(todoLists[0].id);
     } else {
       const id = await createTodoList("My todo list");
       setTodoList({ id });
@@ -60,6 +68,26 @@ const TodoList = () => {
       });
     }
   }, [loading]);
+
+  useEffect(() => {
+    const messageHandler = (event: MessageEvent) => {
+      console.log(event.data)
+      if (
+        todoList &&
+        event.data.type === "todo-list-updated" &&
+        event.data.id === todoList.id &&
+        event.data.source !== "recoil"
+      ) {
+        // Reload the todo list
+        getTodoList(todoList.id);
+      }
+    };
+
+    window.addEventListener("message", messageHandler);
+    return () => {
+      window.removeEventListener("message", messageHandler);
+    };
+  }, [loading, todoList.id]);
 
   const handleDragStart = (event: DragStartEvent) => {
     setDragItem(event.active.id as string);

@@ -33,8 +33,23 @@ export default class TodoListController extends ApplicationController<State> {
       await this.state.todoList.save();
     }
 
+    window.addEventListener("message", this.handleMessage);
+    this.addDependency(() =>
+      window.removeEventListener("message", this.handleMessage)
+    );
+
     this.state.loading = false;
   }
+
+  handleMessage = (event: MessageEvent) => {
+    if (
+      event.data.type === "todo-list-updated" &&
+      event.data.source !== "mvc" &&
+      event.data.id === this.state.todoList!.id
+    ) {
+      this.state.todoList!.reload();
+    }
+  };
 
   async actionAddTodoItem() {
     this.state.creating = true;
@@ -60,6 +75,12 @@ export default class TodoListController extends ApplicationController<State> {
   async actionSave() {
     this.state.saving = true;
     await this.state.todoList!.save();
+
+    window.postMessage(
+      { type: "todo-list-updated", source: "mvc", id: this.state.todoList!.id },
+      "*"
+    );
+
     this.state.saving = false;
   }
 

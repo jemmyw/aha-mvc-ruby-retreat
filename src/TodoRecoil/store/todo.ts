@@ -118,6 +118,18 @@ export const doWithSaving = async (
   }
 };
 
+export async function updateTodoItemWithMessage(
+  listId: string,
+  ...args: Parameters<typeof updateTodoItem>
+) {
+  await updateTodoItem(...args);
+  window.postMessage({
+    type: "todo-list-updated",
+    source: "recoil",
+    id: listId,
+  });
+}
+
 export const updateAllTodoListItems = async (
   listId: string,
   items: TodoItem[]
@@ -140,4 +152,10 @@ export const updateAllTodoListItems = async (
   const deletePromises = toDelete.map((item) => deleteTodoItem(item.id));
 
   await Promise.all([...updatePromises, ...deletePromises]);
+
+  window.postMessage({
+    type: "todo-list-updated",
+    source: "recoil",
+    id: listId,
+  });
 };

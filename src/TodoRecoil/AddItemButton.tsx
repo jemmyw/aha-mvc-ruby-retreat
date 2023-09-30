@@ -1,12 +1,13 @@
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { createTodoItem, updateTodoItem } from "../TodoApi";
+import { createTodoItem } from "../TodoApi";
 import {
   doWithSaving,
   isSavingState,
   todoListItemsState,
   todoListState,
+  updateTodoItemWithMessage,
   updateTodoListItemState,
 } from "./store/todo";
 
@@ -45,7 +46,9 @@ export const AddItemButton = () => {
       updateTodoListItemState(setTodoList)(id)({
         id: response,
       });
-      updateTodoItem(response, { index: todoListItems.length });
+      updateTodoItemWithMessage(todoList.id, response, {
+        index: todoListItems.length,
+      });
     }).finally(() => {
       setCreating(false);
     });
