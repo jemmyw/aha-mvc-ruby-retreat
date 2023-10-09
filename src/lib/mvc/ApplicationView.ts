@@ -190,11 +190,11 @@ export function ApplicationView<T>(Comp: ReactComponent<T>, options?: Options) {
       return render(props);
     };
 
-    if ("displayName" in Comp) {
-      ReactiveComp.displayName = Comp.displayName || Comp.name;
-    } else {
-      ReactiveComp.displayName = Comp.name;
-    }
+    // if ("displayName" in Comp) {
+    //   ReactiveComp.displayName = Comp.displayName || Comp.name;
+    // } else {
+    //   ReactiveComp.displayName = Comp.name;
+    // }
 
     // static props are inherited by class components,
     // but have to be copied for function components
