@@ -11,7 +11,8 @@ export default ApplicationView(() => {
 /**
  * So, I've shown the features and a basic example. But I could implement that
  * example in just about any React store library, or just use some React hooks.
- * Where Aha! MVC gets interesting is complex examples and async code.
+ * It wouldn't be much different.  Where Aha! MVC gets interesting is complex
+ * examples and async code.
  * 
  * Let's take a look at a more complex example. The same todo-list but with a
  * backend for saving.

@@ -70,6 +70,8 @@ export default class TodoListController extends ApplicationController<State> {
 
       this.actionSetDragItemId(null);
     });
+
+    this.actionSave();
   }
 
   async actionSave() {

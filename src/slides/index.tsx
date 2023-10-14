@@ -4,6 +4,11 @@ import Slide11 from "./Slide11";
 import Slide12 from "./Slide12";
 import Slide13 from "./Slide13";
 import Slide14 from "./Slide14";
+import Slide15 from "./Slide15";
+import Slide16 from "./Slide16";
+import Slide17 from "./Slide17";
+import Slide18 from "./Slide18";
+import Slide19 from "./Slide19";
 import Slide2 from "./Slide2";
 import Slide3 from "./Slide3";
 import Slide4 from "./Slide4";
@@ -28,4 +33,9 @@ export default [
   Slide12,
   Slide13,
   Slide14,
+  Slide15,
+  Slide16,
+  Slide17,
+  Slide18,
+  Slide19,
 ];

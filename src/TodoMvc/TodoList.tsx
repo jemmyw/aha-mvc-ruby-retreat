@@ -31,7 +31,6 @@ const TodoList = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { over } = event;
     controller.actionSortAtDragEnd(over?.id as string);
-    controller.actionSave();
   };
 
   if (!todoList || loading) {
