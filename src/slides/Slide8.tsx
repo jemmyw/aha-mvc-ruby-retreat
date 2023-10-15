@@ -6,7 +6,7 @@ export default ApplicationView(() => {
     <div className="flex items-center justify-center w-full h-full prose-2xl">
       <div className="flex flex-col items-center justify-around gap-2">
         <img className="m-0" src={logo} />
-        <h1 className="m-0">MVC</h1>
+        <h1 className="m-0 font-bold">MVC</h1>
       </div>
     </div>
   );
