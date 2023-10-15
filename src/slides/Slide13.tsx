@@ -3,7 +3,7 @@ import { ApplicationView } from "../lib/mvc";
 export default ApplicationView(() => {
   return (
     <div className="flex items-center justify-center w-full h-full prose-2xl">
-      <h1>Comparison</h1>
+      <h1>Comparison with Recoil</h1>
     </div>
   );
 });
@@ -13,11 +13,12 @@ export default ApplicationView(() => {
  * example in just about any React store library, or just use some React hooks.
  * It wouldn't be much different.  Where Aha! MVC gets interesting is complex
  * examples and async code.
- * 
- * Let's take a look at a more complex example. The same todo-list but with a
- * backend for saving.
- * 
- * I've also written the same example using Recoil. I've used Recoil because
- * I've used it before, I like it, and it's a modern take on the kind of
- * patterns that Redux introduced.
+ *
+ * So, let's delve into a more elaborate version of the todo-list app, one that
+ * interacts with a backend for data persistence.
+ *
+ * For a meaningful comparison, I've also implemented this version using Recoil.
+ * My choice for Recoil is twofold: firstly, it's a library I'm familiar with
+ * and fond of. Secondly, it represents the modern evolution of patterns we
+ * first saw in tools like Redux.
  */

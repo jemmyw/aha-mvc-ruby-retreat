@@ -20,6 +20,6 @@ export default ApplicationView(() => {
  * with a lot of unnecessary re-renders.
  * 
  * Since moving to functional components and hooks, we lost some lifecycle
- * management. Now, I really like hooks. But I've seen a constant fat views
- * problem in React
+ * management. Personally, I appreciate hooks, but it's hard to ignore the
+ * persistent "fat views" dilemma cropping up in React projects.
  */

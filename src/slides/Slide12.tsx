@@ -36,13 +36,16 @@ export default ApplicationView(() => {
  * When observe is called with the callback, nx-js will record the paths of the
  * observable properties that are accessed. That allows it to only re-run the
  * callback when those properties change.
- * 
+ *
  * Notice that the observe callback for the specific key in this example is the
  * one that is called.
- * 
+ *
  * Signals are the all new hotness in the JavaScript world, but this library has
  * been doing it better for years.
- * 
- * ApplicationView turns a component render function into an observer.
- * ApplicationController's `state` property is an observable.
+ *
+ * Tying this back to Aha! MVC: The `ApplicationView` essentially transforms a
+ * component's render function into this observer mechanism. Coupled with the
+ * `ApplicationController`, where the `state` property is inherently observable,
+ * we achieve a reactive architecture, primed for efficient and seamless
+ * updates.
  */
