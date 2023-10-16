@@ -23,3 +23,6 @@ export default ApplicationView(() => {
  * management. Personally, I appreciate hooks, but it's hard to ignore the
  * persistent "fat views" dilemma cropping up in React projects.
  */
+
+
+// Break into multiple slides with images

@@ -92,3 +92,5 @@ export default ApplicationView(() => {
  * app the whole list re-renders. I would need to do a little performance tuning
  * on this Recoil react if it was going to be dealing with a large list.
  */
+
+// Makes todo notes better

@@ -24,9 +24,3 @@ export default ApplicationView(() => {
     </div>
   );
 });
-
-/**
- * React. I really like React. I've been using it for a long time.  There are
- * plenty of other JavaScript frameworks out there, but if you want to build a
- * web app, React is a solid choice.
- */

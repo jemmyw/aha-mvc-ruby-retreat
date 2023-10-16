@@ -22,3 +22,5 @@ export default ApplicationView(() => {
  * and fond of. Secondly, it represents the modern evolution of patterns we
  * first saw in tools like Redux.
  */
+
+// Maybe some slides on proxies and observables

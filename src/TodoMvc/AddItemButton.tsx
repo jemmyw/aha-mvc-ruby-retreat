@@ -8,7 +8,7 @@ const AddItemButton = () => {
   const [savingClassName, setSavingClassName] = useState("opacity-0");
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (saving) {
       setSavingClassName("opacity-100");
