@@ -8,6 +8,7 @@ interface State {
   slide: number;
   transitioning: boolean;
   shortcutsEnabled: boolean;
+  cameFrom: "previous" | "next" | "none";
 }
 
 function slideFromUrl(url: URL) {
@@ -23,7 +24,12 @@ function urlForSlide(slide: number) {
 
 export default class PresentationController extends ApplicationController<State> {
   get initialState(): State {
-    return { slide: 1, transitioning: false, shortcutsEnabled: true };
+    return {
+      slide: 1,
+      transitioning: false,
+      shortcutsEnabled: true,
+      cameFrom: "none",
+    };
   }
 
   get SlideComponent() {
@@ -117,8 +123,10 @@ export default class PresentationController extends ApplicationController<State>
     this.setState({ transitioning: true });
 
     if (slide < this.state.slide) {
+      this.state.cameFrom = "next";
       document.documentElement.classList.add("back-transition");
     } else {
+      this.state.cameFrom = "previous";
       document.documentElement.classList.add("next-transition");
     }
 
