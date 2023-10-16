@@ -1,7 +1,6 @@
-import { ApplicationView } from "../lib/mvc";
-import logo from "../assets/aha.png";
+import Slide from "./Slide";
 
-export default ApplicationView(() => {
+export default Slide(() => {
   return (
     <div className="flex items-center justify-center w-full h-full prose-2xl">
       <ul className="text-4xl list-disc">

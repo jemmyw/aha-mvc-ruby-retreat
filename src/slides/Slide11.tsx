@@ -1,5 +1,5 @@
 import { Highlighter } from "../components/Highlighter";
-import { ApplicationView } from "../lib/mvc";
+import Slide from "./Slide";
 
 const code = `
 import { observe, observable } from '@nx-js/observer-util';
@@ -7,7 +7,7 @@ import { observe, observable } from '@nx-js/observer-util';
 const store = observable({ count: 0, list: [] });
 `;
 
-export default ApplicationView(() => {
+export default Slide(() => {
   return (
     <div className="flex items-center justify-center w-full h-full prose-2xl">
       <Highlighter code={code} />

@@ -7,7 +7,6 @@ import BlankSlide from "../slides/BlankSlide";
 interface State {
   slide: number;
   transitioning: boolean;
-  shortcutsEnabled: boolean;
   cameFrom: "previous" | "next" | "none";
 }
 
@@ -27,7 +26,6 @@ export default class PresentationController extends ApplicationController<State>
     return {
       slide: 1,
       transitioning: false,
-      shortcutsEnabled: true,
       cameFrom: "none",
     };
   }
@@ -69,21 +67,6 @@ export default class PresentationController extends ApplicationController<State>
       navigation?.removeEventListener("navigate", handleNavigate);
     });
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (!this.state.shortcutsEnabled) return;
-
-      if (event.key === " " || event.key === "ArrowRight") {
-        this.actionNextSlide();
-      }
-      if (event.key === "ArrowLeft") {
-        this.actionPrevSlide();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    this.addDependency(() =>
-      document.removeEventListener("keydown", handleKeyDown)
-    );
-
     const slide = slideFromUrl(new URL(window.location.href));
     if (slide) {
       this.state.slide = slideFromUrl(new URL(window.location.href)) || 1;
@@ -104,14 +87,6 @@ export default class PresentationController extends ApplicationController<State>
   actionPrevSlide() {
     if (this.state.slide === 1) return;
     this.actionNavigateToSlide(this.state.slide - 1);
-  }
-
-  actionEnableShortcuts() {
-    this.state.shortcutsEnabled = true;
-  }
-
-  actionDisableShortcuts() {
-    this.state.shortcutsEnabled = false;
   }
 
   async transition(slide: number) {

@@ -1,5 +1,5 @@
-import { ApplicationView } from "../lib/mvc";
+import Slide from "./Slide";
 
-export default ApplicationView(() => {
+export default Slide(() => {
   return <div></div>;
 });

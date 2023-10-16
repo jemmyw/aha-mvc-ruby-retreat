@@ -1,7 +1,7 @@
-import { ApplicationView } from "../lib/mvc";
 import librariesPng from "../assets/libraries.png";
+import Slide from "./Slide";
 
-export default ApplicationView(() => {
+export default Slide(() => {
   return <div>
     <img src={librariesPng} alt="React state libraries" />
   </div>;

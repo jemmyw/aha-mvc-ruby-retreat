@@ -18,14 +18,11 @@ export default class SlideController extends ApplicationController<State> {
     this.addDependency(() =>
       document.removeEventListener("keydown", this.handleKeyDown)
     );
-
-    this.get(PresentationController).actionDisableShortcuts();
-    this.addDependency(() => {
-      this.get(PresentationController).actionEnableShortcuts();
-    });
   }
 
   handleKeyDown = (event: KeyboardEvent) => {
+    if (this.locked) return;
+
     if (event.key === "ArrowRight" || event.key === " ") {
       event.preventDefault();
       this.actionAdvance();
@@ -36,19 +33,40 @@ export default class SlideController extends ApplicationController<State> {
     }
   };
 
+  get locked() {
+    return this.getElementsAtCurrentIndex().some((el) => el.dataset.lock);
+  }
+
   get elements() {
     if (!this.element) return [];
     return [
       ...this.element.querySelectorAll(":scope [data-show]"),
+      ...this.element.querySelectorAll(":scope [data-lock]"),
     ] as HTMLElement[];
+  }
+
+  getElementsAtIndex(index: number) {
+    return this.elements.filter(
+      (element) =>
+        Number(element.dataset.show) === index ||
+        Number(element.dataset.lock) === index
+    );
+  }
+
+  getElementsAtCurrentIndex() {
+    return this.getElementsAtIndex(this.state.elementIndex);
   }
 
   get elementCount(): number {
     if (!this.element) return 0;
 
     return this.elements.reduce((count, element) => {
-      const n = Number(element.dataset.show);
-      if (n > count) return n;
+      const showIndex = Number(element.dataset.show);
+      if (showIndex > count) return showIndex;
+
+      const lockIndex = Number(element.dataset.lock);
+      if (lockIndex > count) return lockIndex;
+
       return count;
     }, 0);
   }
@@ -69,6 +87,8 @@ export default class SlideController extends ApplicationController<State> {
   showToIndex() {
     if (!this.element) return;
     this.elements.forEach((element) => {
+      if (!element.dataset.show) return;
+
       const index = Number(element.dataset.show);
 
       if (index <= this.state.elementIndex) {
