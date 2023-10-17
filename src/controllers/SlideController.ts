@@ -41,6 +41,7 @@ export default class SlideController extends ApplicationController<State> {
     if (!this.element) return [];
     return [
       ...this.element.querySelectorAll(":scope [data-show]"),
+      ...this.element.querySelectorAll(":scope [data-hide]"),
       ...this.element.querySelectorAll(":scope [data-lock]"),
     ] as HTMLElement[];
   }
@@ -87,14 +88,26 @@ export default class SlideController extends ApplicationController<State> {
   showToIndex() {
     if (!this.element) return;
     this.elements.forEach((element) => {
-      if (!element.dataset.show) return;
+      if (element.dataset.show) {
+        const index = Number(element.dataset.show);
+        const className = element.dataset["hideClass"] ?? "invisible";
 
-      const index = Number(element.dataset.show);
+        if (index <= this.state.elementIndex) {
+          element.classList.remove(className);
+        } else {
+          element.classList.add(className);
+        }
+      }
 
-      if (index <= this.state.elementIndex) {
-        element.classList.remove("invisible");
-      } else {
-        element.classList.add("invisible");
+      if (element.dataset.hide) {
+        const index = Number(element.dataset.hide);
+        const className = element.dataset["hideClass"] ?? "invisible";
+
+        if (index <= this.state.elementIndex) {
+          element.classList.add(className);
+        } else {
+          element.classList.remove(className);
+        }
       }
     });
   }

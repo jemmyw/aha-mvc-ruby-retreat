@@ -14,7 +14,9 @@ import Slide2 from "./Slide2";
 import Slide3 from "./Slide3";
 import Slide4 from "./Slide4";
 import Slide5 from "./Slide5";
-import Slide6 from "./Slide6";
+import Slide6a from "./Slide6a";
+import Slide6c from "./Slide6c";
+import Slide6d from "./Slide6d";
 import Slide7 from "./Slide7";
 import Slide8 from "./Slide8";
 import Slide9 from "./Slide9";
@@ -26,7 +28,9 @@ export default [
   Slide3,
   Slide4,
   Slide5,
-  Slide6,
+  Slide6a,
+  Slide6c,
+  Slide6d,
   Slide7,
   Slide8,
   Slide9,
