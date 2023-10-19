@@ -1,11 +1,14 @@
-import SlideController from "../controllers/SlideController";
+import SlideController, { Options } from "../controllers/SlideController";
 import { ApplicationView, useController } from "../lib/mvc";
 
-function Slide(Component: React.FC) {
+function Slide(ComponentOrOptions: React.FC | Options, Component?: React.FC) {
+  const options = Component ? (ComponentOrOptions as Options) : {};
+  Component = Component || (ComponentOrOptions as React.FC);
   const ActiveComponent = ApplicationView(Component);
 
   const ActiveSlide = () => {
     const controller = useController(SlideController);
+    controller.setOptions(options);
 
     return (
       <div

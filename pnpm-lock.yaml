@@ -17,6 +17,9 @@ dependencies:
   '@nx-js/observer-util':
     specifier: ^4.2.2
     version: 4.2.2
+  '@types/web':
+    specifier: ^0.0.117
+    version: 0.0.117
   debug:
     specifier: ^4.3.4
     version: 4.3.4
@@ -648,6 +651,10 @@ packages:
 
   /@types/unist@3.0.0:
     resolution: {integrity: sha512-MFETx3tbTjE7Uk6vvnWINA/1iJ7LuMdO4fcq8UfF0pRbj01aGLduVvQcRyswuACJdpnHgg8E3rQLhaRdNEJS0w==}
+    dev: false
+
+  /@types/web@0.0.117:
+    resolution: {integrity: sha512-RuiWqL7X8vZjg9gB6vWHfqz6/u7RAghWlAsIYm8pImmtRsrupiWPH3yTUu+iutLx8om9U0W/CpP8Lx1rDYBjYw==}
     dev: false
 
   /@typescript-eslint/eslint-plugin@6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.45.0)(typescript@5.0.2):

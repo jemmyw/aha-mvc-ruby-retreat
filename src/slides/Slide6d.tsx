@@ -70,7 +70,7 @@ export default Slide(() => {
       <h2>React has a fat views problem</h2>
       <img
         src={fatreact}
-        className="w-[66%]"
+        className="w-[50%]"
         data-hide={1}
         data-hide-class="hidden"
       />

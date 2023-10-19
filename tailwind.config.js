@@ -3,8 +3,10 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      fontSize: {
-      }
+      animation: {
+        "fade-out-border": "fadeOutBorder 0.5s forwards",
+      },
+      fontSize: {},
     },
   },
   plugins: [require("@tailwindcss/typography")],

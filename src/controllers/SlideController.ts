@@ -2,15 +2,21 @@ import ApplicationController from "../lib/mvc";
 import PresentationController from "./PresentationController";
 
 interface State {
-  elementIndex: number;
-  elementCount: number;
+  stepIndex: number;
+  stepCount: number;
+}
+
+export interface Options {
+  advanceKeys?: string[];
+  backKeys?: string[];
 }
 
 export default class SlideController extends ApplicationController<State> {
   element?: HTMLElement;
+  options: Options = {};
 
   get initialState(): State {
-    return { elementIndex: 0, elementCount: 0 };
+    return { stepIndex: 0, stepCount: 0 };
   }
 
   initialize() {
@@ -20,14 +26,21 @@ export default class SlideController extends ApplicationController<State> {
     );
   }
 
+  setOptions(options: Options) {
+    this.options = options;
+  }
+
   handleKeyDown = (event: KeyboardEvent) => {
     if (this.locked) return;
 
-    if (event.key === "ArrowRight" || event.key === " ") {
+    const advanceKeys = this.options.advanceKeys ?? ["ArrowRight", " "];
+    const backKeys = this.options.backKeys ?? ["ArrowLeft"];
+
+    if (advanceKeys.includes(event.key)) {
       event.preventDefault();
       this.actionAdvance();
     }
-    if (event.key === "ArrowLeft") {
+    if (backKeys.includes(event.key)) {
       event.preventDefault();
       this.actionBack();
     }
@@ -55,15 +68,18 @@ export default class SlideController extends ApplicationController<State> {
   }
 
   getElementsAtCurrentIndex() {
-    return this.getElementsAtIndex(this.state.elementIndex);
+    return this.getElementsAtIndex(this.state.stepIndex);
   }
 
-  get elementCount(): number {
+  get stepCount(): number {
     if (!this.element) return 0;
 
     return this.elements.reduce((count, element) => {
       const showIndex = Number(element.dataset.show);
       if (showIndex > count) return showIndex;
+
+      const hideIndex = Number(element.dataset.hide);
+      if (hideIndex > count) return hideIndex;
 
       const lockIndex = Number(element.dataset.lock);
       if (lockIndex > count) return lockIndex;
@@ -73,15 +89,15 @@ export default class SlideController extends ApplicationController<State> {
   }
 
   registerSlide(element: HTMLElement | null) {
-    if(this.element === element) return;
+    if (this.element === element) return;
 
     this.element = element ?? undefined;
-    this.state.elementCount = this.elementCount;
+    this.state.stepCount = this.stepCount;
 
     if (this.presentationController.state.cameFrom === "next") {
-      this.state.elementIndex = this.elementCount;
+      this.state.stepIndex = this.stepCount;
     } else {
-      this.state.elementIndex = 0;
+      this.state.stepIndex = 0;
     }
 
     this.showToIndex();
@@ -89,27 +105,19 @@ export default class SlideController extends ApplicationController<State> {
 
   showToIndex() {
     if (!this.element) return;
+
     this.elements.forEach((element) => {
-      if (element.dataset.show) {
-        const index = Number(element.dataset.show);
-        const className = element.dataset["hideClass"] ?? "invisible";
+      const showAt = element.dataset.show ? Number(element.dataset.show) : 0;
+      const hideAt = element.dataset.hide ? Number(element.dataset.hide) : null;
+      const className = element.dataset["hideClass"] ?? "invisible";
 
-        if (index <= this.state.elementIndex) {
-          element.classList.remove(className);
-        } else {
-          element.classList.add(className);
-        }
-      }
-
-      if (element.dataset.hide) {
-        const index = Number(element.dataset.hide);
-        const className = element.dataset["hideClass"] ?? "invisible";
-
-        if (index <= this.state.elementIndex) {
-          element.classList.add(className);
-        } else {
-          element.classList.remove(className);
-        }
+      if (
+        showAt <= this.state.stepIndex &&
+        (hideAt === null || hideAt > this.state.stepIndex)
+      ) {
+        element.classList.remove(className);
+      } else {
+        element.classList.add(className);
       }
     });
   }
@@ -119,8 +127,8 @@ export default class SlideController extends ApplicationController<State> {
   }
 
   actionAdvance() {
-    if (this.state.elementIndex < this.elementCount) {
-      this.setState({ elementIndex: this.state.elementIndex + 1 });
+    if (this.state.stepIndex < this.stepCount) {
+      this.setState({ stepIndex: this.state.stepIndex + 1 });
     } else if (this.presentationController.canGoForward) {
       this.resolveDependency("keydown");
       this.presentationController.actionNextSlide();
@@ -130,8 +138,8 @@ export default class SlideController extends ApplicationController<State> {
   }
 
   actionBack() {
-    if (this.state.elementIndex > 0) {
-      this.setState({ elementIndex: this.state.elementIndex - 1 });
+    if (this.state.stepIndex > 0) {
+      this.setState({ stepIndex: this.state.stepIndex - 1 });
     } else if (this.presentationController.canGoBack) {
       this.resolveDependency("keydown");
       this.presentationController.actionPrevSlide();

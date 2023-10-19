@@ -20,7 +20,8 @@ export default class TodoListController extends ApplicationController<State> {
 
   actionAddTodoItem() {
     this.state.todoList.addItem(new TodoItem());
-    console.log(this.state.todoList.items);
+    // @ts-expect-error
+    window._items = this.state.todoList.items;
   }
 
   actionSetDragItemId(id: string | null) {

@@ -75,5 +75,5 @@ export default Slide(() => {
  *
  * A lot of state management libraries... I collected logos until I got bored.
  *
- * I've tried and used a few of these.
+ * I've tried and used a few of these. 
  */

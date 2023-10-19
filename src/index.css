@@ -80,3 +80,8 @@ h1 {
     transform: translateX(100%);
   }
 }
+@keyframes fadeOutBorder {
+  to {
+    border-color: transparent;
+  }
+}
