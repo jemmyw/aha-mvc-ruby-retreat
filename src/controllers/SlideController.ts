@@ -15,7 +15,7 @@ export default class SlideController extends ApplicationController<State> {
 
   initialize() {
     document.addEventListener("keydown", this.handleKeyDown);
-    this.addDependency(() =>
+    this.addDependency("keydown", () =>
       document.removeEventListener("keydown", this.handleKeyDown)
     );
   }
@@ -73,10 +73,12 @@ export default class SlideController extends ApplicationController<State> {
   }
 
   registerSlide(element: HTMLElement | null) {
+    if(this.element === element) return;
+
     this.element = element ?? undefined;
     this.state.elementCount = this.elementCount;
 
-    if (this.get(PresentationController).state.cameFrom === "next") {
+    if (this.presentationController.state.cameFrom === "next") {
       this.state.elementIndex = this.elementCount;
     } else {
       this.state.elementIndex = 0;
@@ -112,11 +114,16 @@ export default class SlideController extends ApplicationController<State> {
     });
   }
 
+  get presentationController() {
+    return this.get(PresentationController);
+  }
+
   actionAdvance() {
     if (this.state.elementIndex < this.elementCount) {
       this.setState({ elementIndex: this.state.elementIndex + 1 });
-    } else {
-      this.get(PresentationController).actionNextSlide();
+    } else if (this.presentationController.canGoForward) {
+      this.resolveDependency("keydown");
+      this.presentationController.actionNextSlide();
     }
 
     this.showToIndex();
@@ -125,8 +132,9 @@ export default class SlideController extends ApplicationController<State> {
   actionBack() {
     if (this.state.elementIndex > 0) {
       this.setState({ elementIndex: this.state.elementIndex - 1 });
-    } else {
-      this.get(PresentationController).actionPrevSlide();
+    } else if (this.presentationController.canGoBack) {
+      this.resolveDependency("keydown");
+      this.presentationController.actionPrevSlide();
     }
 
     this.showToIndex();

@@ -1,9 +1,11 @@
 import Slide from "./Slide";
+import logo from "../assets/react.svg";
 
 export default Slide(() => {
   return (
-    <div className="flex items-center justify-center w-full h-full prose-2xl">
+    <div className="flex flex-col items-center justify-center w-full h-full prose-2xl">
       <h1>React</h1>
+      <img src={logo} width={"15%"} />
     </div>
   );
 });

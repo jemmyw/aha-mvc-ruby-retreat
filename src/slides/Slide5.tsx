@@ -13,9 +13,9 @@ export default Slide(() => {
 });
 
 /**
- * By and large these libraries are all very similar. They all favour immutable
- * data structures, they all encourage a functional style of programming, and
- * they all make heavy use of memoization.
+ * By and large a lot of these libraries are very similar. They all favour
+ * immutable data structures, they all encourage a functional style of
+ * programming, and they all make heavy use of memoization.
  *
  * There's good reason for this. Changing the state in a performant way requires
  * that you know what has changed. If you're using mutable data structures, then

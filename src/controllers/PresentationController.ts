@@ -80,19 +80,27 @@ export default class PresentationController extends ApplicationController<State>
   }
 
   actionNextSlide() {
-    if (this.state.slide === slides.length) return;
-    this.actionNavigateToSlide(this.state.slide + 1);
+    if (this.canGoForward) {
+      this.actionNavigateToSlide(this.state.slide + 1);
+    }
   }
 
   actionPrevSlide() {
-    if (this.state.slide === 1) return;
-    this.actionNavigateToSlide(this.state.slide - 1);
+    if (this.canGoBack) {
+      this.actionNavigateToSlide(this.state.slide - 1);
+    }
   }
+
+  viewTransition?: ViewTransition;
 
   async transition(slide: number) {
     if (slide === this.state.slide) return;
     if (slide < 1 || slide > slides.length) {
       return this.actionNavigateToSlide(1);
+    }
+
+    if (this.viewTransition) {
+      await this.viewTransition.finished;
     }
 
     this.setState({ transitioning: true });
@@ -105,20 +113,21 @@ export default class PresentationController extends ApplicationController<State>
       document.documentElement.classList.add("next-transition");
     }
 
-    const transition = document.startViewTransition(() => {
+    this.viewTransition = document.startViewTransition(() => {
       flushSync(() => {
         immediate(() => this.setState({ slide }));
       });
     });
 
-    await transition.ready;
+    await this.viewTransition.ready;
 
     try {
-      await transition.finished;
+      await this.viewTransition.finished;
     } finally {
       this.setState({ transitioning: false });
       document.documentElement.classList.remove("back-transition");
       document.documentElement.classList.remove("next-transition");
+      this.viewTransition = undefined;
     }
   }
 }
