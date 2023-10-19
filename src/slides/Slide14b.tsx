@@ -1,8 +1,91 @@
-import TodoApp from "../TodoApp";
+import { Highlighter } from "../components/Highlighter";
 import Slide from "./Slide";
 
-export default Slide({ advanceKeys: ["ArrowRight"] }, () => {
-  return <TodoApp />;
+const code1 = `
+const TodoItem: React.FC<Props> = ({ item }) => {
+  const todoList = useRecoilValue(todoListState);
+  const [todoItem, setTodoItem] = useRecoilState(todoListItemState(item.id));
+  const setIsSaving = useSetRecoilState(isSavingState);
+  const savingTimeout = useRef<number | null>(null);
+
+  const save = useCallback((todoItem: Props["item"]) => {
+    if (savingTimeout.current) return;
+    savingTimeout.current = setTimeout(() => {
+      doWithSaving(setIsSaving, async () => {
+        await updateTodoItemWithMessage(todoList.id, todoItem.id, todoItem);
+        savingTimeout.current = null;
+      });
+    }, 250);
+  }, []);
+
+  const handleCompleted = useCallback(() => {
+    const completed = !todoItem.completed;
+    setTodoItem({ ...todoItem, completed });
+    save({ ...todoItem, completed });
+  }, [save, todoItem]);
+
+  const handleNameChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTodoItem({ ...todoItem, name: event.target.value });
+      save({ ...todoItem, name: event.target.value });
+    },
+    [save, todoItem]
+  );
+
+  return (
+    <li>
+      <input
+        type="checkbox"
+        checked={item.completed}
+        onChange={handleCompleted}
+      />
+      <input
+        type="text"
+        value={item.name}
+        className="w-full p-1 text-gray-100 bg-gray-700 rounded-none focus:outline-none active:border-gray-700 "
+        onChange={handleNameChange}
+      />
+    </li>
+  );
+};
+`;
+
+const code2 = `
+const TodoItem = ApplicationView(() => {
+  const controller = useController(TodoItemController);
+  const { item } = controller.state;
+
+  return (
+    <li>
+      <input
+        type="checkbox"
+        checked={item.completed}
+        onChange={() => controller.actionUpdate({ completed: !item.completed })}
+      />
+      <input
+        type="text"
+        value={item.name}
+        className="w-full p-1 text-gray-100 bg-gray-700 rounded-none focus:outline-none active:border-gray-700 "
+        onChange={e => controller.actionUpdate({ name: event.target.value })}
+      />
+      <button onClick={() => controller.actionDelete()}>x</button>
+    </li>
+  );
+};
+`;
+
+const codes = [code1, code2];
+
+export default Slide(() => {
+  return (
+    <div className="flex items-center justify-center w-full h-full prose-2xl">
+      {codes.map((code, i) => (
+        <div key={i} data-show={i} data-hide={i + 1} data-hide-class="hidden">
+          <Highlighter code={code} />
+        </div>
+      ))}
+    </div>
+  );
 });
 
 /**

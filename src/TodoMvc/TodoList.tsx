@@ -39,7 +39,6 @@ const TodoList = () => {
 
   const dragItem = dragItemId ? todoList.findById(dragItemId) : null;
   const items = todoList.items;
-  console.log(items);
 
   return (
     <div className="flex flex-col gap-4">

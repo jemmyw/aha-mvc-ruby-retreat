@@ -5,7 +5,7 @@ import { ApplicationView } from "./lib/mvc";
 
 function TodoApp() {
   return (
-    <div className="flex justify-around w-full h-full" data-lock={1}>
+    <div className="flex justify-around w-full h-full">
       <div className="w-[40%] h-full py-10">
         <TodoMvc />
       </div>

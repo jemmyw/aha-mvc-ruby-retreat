@@ -1,8 +1,88 @@
-import TodoApp from "../TodoApp";
+import { Highlighter } from "../components/Highlighter";
 import Slide from "./Slide";
 
-export default Slide({ advanceKeys: ["ArrowRight"] }, () => {
-  return <TodoApp />;
+const code1 = `
+export const savingState = atom({
+  key: "Saving",
+  default: false,
+});
+
+export const todoListsState = selector({
+  key: "TodoLists",
+  get: async () => {
+    return await listAllTodoLists();
+  },
+});
+
+export const todoListState = atom<TodoList>({
+  key: "TodoList",
+  default: { id: "" },
+});
+
+export const todoListItemsState = atom<TodoItem[]>({
+  key: "TodoListItems",
+  default: [],
+});
+`;
+
+const code2 = `
+export const todoListItemState = selectorFamily({
+  key: "TodoListItem",
+  get:
+    (id: string) =>
+    ({ get }) => {
+      return findById(get(todoListItemsState), id)!;
+    },
+  set:
+    (id: string) =>
+    ({ set }, newValue) => {
+      if (newValue instanceof DefaultValue || !newValue) {
+        return;
+      }
+      updateTodoListItemState((v) => set(todoListItemsState, v))(id)(newValue);
+    },
+});
+`;
+
+const code3 = `
+export function replaceItemAtIndex(
+  arr: TodoItem[],
+  index: number,
+  newValue: TodoItem
+) {
+  return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)];
+}
+
+export function removeItemAtIndex(arr: TodoItem[], index: number) {
+  return [...arr.slice(0, index), ...arr.slice(index + 1)];
+}
+
+export const updateTodoListItemState =
+  (setter: SetterOrUpdater<TodoItem[]>) =>
+  (id: string) =>
+  (item: Partial<TodoItem>) => {
+    setter((list) => {
+      const index = findIndexById(list, id);
+      if (index === -1) {
+        return list;
+      }
+      return replaceItemAtIndex(list, index, { ...list[index], ...item });
+    });
+  };
+  `;
+
+const codes = [code1, code2, code3];
+
+export default Slide(() => {
+  return (
+    <div className="flex items-center justify-center w-full h-full prose-2xl">
+      {codes.map((code, i) => (
+        <div key={i} data-show={i} data-hide={i + 1} data-hide-class="hidden">
+          <Highlighter code={code} />
+        </div>
+      ))}
+    </div>
+  );
 });
 
 /**

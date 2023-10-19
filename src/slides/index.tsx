@@ -2,9 +2,12 @@ import Slide0 from "./Slide0";
 import Slide1 from "./Slide1";
 import Slide10 from "./Slide10";
 import Slide11 from "./Slide11";
-import Slide12 from "./Slide12";
 import Slide13 from "./Slide13";
 import Slide14 from "./Slide14";
+import Slide14a from "./Slide14a";
+import Slide14b from "./Slide14b";
+import Slide14c from "./Slide14c";
+import Slide14d from "./Slide14d";
 import Slide15 from "./Slide15";
 import Slide16 from "./Slide16";
 import Slide17 from "./Slide17";
@@ -32,9 +35,12 @@ export default [
   Slide9,
   Slide10,
   Slide11,
-  Slide12,
   Slide13,
   Slide14,
+  Slide14a,
+  Slide14b,
+  Slide14c,
+  Slide14d,
   Slide15,
   Slide16,
   Slide17,

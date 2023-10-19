@@ -57,9 +57,6 @@ export default Slide(() => {
   return (
     <div className="relative flex flex-col items-center justify-start w-full h-full prose-2xl">
       <h2 className="mt-5">Immutable updates can be slow</h2>
-      <h3 className="mt-0" data-show={1}>
-        Care needed to update the components
-      </h3>
 
       <UpdatesComponent />
     </div>

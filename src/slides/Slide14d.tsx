@@ -1,8 +1,93 @@
-import TodoApp from "../TodoApp";
+import { Highlighter } from "../components/Highlighter";
 import Slide from "./Slide";
 
-export default Slide({ advanceKeys: ["ArrowRight"] }, () => {
-  return <TodoApp />;
+const code1 = `
+class TodoListController extends ApplicationController<State> {
+  get initialState(): State {
+    return {
+      loading: true,
+      creating: false,
+      saving: false,
+    };
+  }
+`;
+
+const code2 = `
+  async initialize() {
+    const allLists = await listAllTodoLists();
+
+    if (allLists.length > 0) {
+      this.state.todoList = await TodoList.find(allLists[0].id);
+    } else {
+      this.state.todoList = new TodoList();
+      this.state.todoList.title = "My list";
+      await this.state.todoList.save();
+    }
+
+    window.addEventListener("message", this.handleMessage);
+
+    this.state.loading = false;
+  }
+`;
+
+const code3 = `
+  destroy() {
+    window.removeEventListener("message", this.handleMessage);
+  }
+`
+
+const code4 = `
+  async actionAddTodoItem() {
+    this.state.creating = true;
+    this.state.todoList!.addItem(new TodoItem());
+    await this.actionSave();
+    this.state.creating = false;
+  }
+
+  async actionSave() {
+    this.state.saving = true;
+    await this.state.todoList!.save();
+
+    window.postMessage(
+      { type: "todo-list-updated", source: "mvc", id: this.state.todoList!.id },
+      "*"
+    );
+
+    this.state.saving = false;
+  }
+  `;
+
+const code5 = `
+class TodoItemController extends ApplicationController<State, Props> {
+  async initialize(props: Props) {
+    this.state.item = props.item;
+  }
+
+  async changeProps(props: Props) {
+    this.state.item = props.item;
+  }
+
+  async actionUpdate(updates: Partial<TodoItem>) {
+    Object.entries(updates).forEach(([key, value]) => {
+      (this.state.item as any)[key] = value;
+    });
+
+    await this.findControllerInstance(TodoListController).actionSave();
+  }
+`;
+
+const codes = [code1, code2, code3, code4, code5];
+
+export default Slide(() => {
+  return (
+    <div className="flex items-center justify-center w-full h-full prose-2xl">
+      {codes.map((code, i) => (
+        <div key={i} data-show={i} data-hide={i + 1} data-hide-class="hidden">
+          <Highlighter code={code} />
+        </div>
+      ))}
+    </div>
+  );
 });
 
 /**
