@@ -20,5 +20,8 @@ export default Slide(() => {
 /**
  * We necessarily have to set the flow of our application off from the view,
  * because React is views, but it's not views of a larger framework.
+ * 
+ * This creates a problem of code separation and re-use. Tracing the flow of
+ * react apps can sometimes get difficult too.
  */
 

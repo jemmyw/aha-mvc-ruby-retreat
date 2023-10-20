@@ -65,7 +65,7 @@ export default Slide(() => {
 
 /**
  * These things can all lead to problems though. Immutable modifications can be
- * slow, and care needs to be taken to make sure that the components are
- * updated. If you update the state in the wrong place, then you can end up
+ * slow, and care needs to be taken to make sure that the components are updated
+ * correctly. If you update the state in the wrong place, then you can end up
  * with a lot of unnecessary re-renders.
  */
